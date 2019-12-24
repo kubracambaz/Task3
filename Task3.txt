@@ -1,0 +1,14 @@
+WITH test_query AS (
+SELECT g.name AS group_name,
+       COUNT(c.group_name) AS all_test_cases,
+       COUNT(CASE WHEN c.status = 'OK' THEN 1 END) AS passed_test_cases    
+FROM TEST_CASES c
+RIGHT OUTER JOIN TEST_GROUPS g ON g.NAME = c.GROUP_NAME
+GROUP BY g.name
+)
+SELECT group_name AS name,
+       all_test_cases,
+       passed_test_cases,
+       (passed_test_cases * (SELECT C.TETS_VALUE FROM TEST_GROUPS C WHERE C.NAME = group_name)) AS total_value
+FROM test_query
+ORDER BY total_value DESC, name ASC;
